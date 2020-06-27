@@ -7,85 +7,61 @@ var app = express();
 var port = process.env.PORT || 3000;
 
 app.use(express.json());
-app.post("/users", (req, res) => {
+app.post("/users", async (req, res) => {
   // console.log(req.body);
   var user = new User(req.body);
-  // res.send('nodejs development');
-  user
-    .save()
-    .then(() => {
-      res.status(201).send(user);
-    })
-    .catch((e) => {
-      res.status(400).send(e);
-    });
+  try {
+    await user.save();
+    res.status(201).send(user);
+  } catch (e) {
+    res.status(400).send(e);
+  }
 });
 
-app.get("/users", (req, res) => {
-  User.find({})
-    .then((users) => {
-      res.send(users);
-    })
-    .catch((err) => {
-      res.status(500).send(err);
-    });
+app.get("/users", async (req, res) => {
+  try {
+    var users = await User.find({});
+    res.send(users);
+  } catch (err) {
+    res.status(500).send(err);
+  }
 });
 
 //get one user
-app.get("/users/:id", (req, res) => {
+app.get("/users/:id", async (req, res) => {
   var id = req.params.id;
-  User.findById(id)
-    .then((user) => {
-      if (!user) {
-        return res.status(400).send();
-      }
-      res.send(user);
-    })
-    .catch((e) => {
-      res.status(500).send(e);
-    });
-  //   console.log(req.params);
+  try {
+    var user = await User.findById(id);
+    if (!user) {
+      return res.status(400).send();
+    }
+    res.send(user);
+  } catch (e) {
+    res.status(500).send(e);
+  }
 });
 
 //updating Request
-// app.put('/users', (req, res)=>{
-//     var id = parseInt(req.params.id);
-//     var updateUser = new User(req.body);
-//     User.find(User["Users" + id] != null).then(()=>{
-//     // update user
-//     User["Users" + id] = updateUser;
-//     console.log("--->Update Successfully, users: \n" + JSON.stringify(User))
-
-//     // return
-//     res.end("Update Successfully! \n" + JSON.stringify(updateUser));
-
-//     }).catch((e)=>{
-//         res.end("User Don't exist7\4444444444]]]]\n:" + JSON.stringify(updateUser));
-//     })
-// })
 
 //create a post request for task
-app.post("/tasks", (req, res) => {
+app.post("/tasks", async (req, res) => {
   var task = new Task(req.body);
-  task
-    .save()
-    .then(() => {
-      res.status(201).send(task);
-    })
-    .catch((err) => {
-      res.status(400).send(err);
-    });
+  try {
+    await task.save();
+    res.status(201).send(task);
+  } catch (e) {
+    res.status(400).send(e);
+  }
 });
 
 //get request for tasks
-app.get("/tasks", (req, res) => {
-  Task.find({})
-    .then((tasks) => {
-      res.send(tasks);
-    })
-    .catch((e) => {
-      res.status(400).send(e);
-    });
+app.get("/tasks", async (req, res) => {
+  try {
+    var task = await Task.find({});
+    res.send(tasks);
+  } catch (e) {
+    res.status(400).send(e);
+  }
 });
 
 app.listen(port, () => {
