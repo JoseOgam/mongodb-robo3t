@@ -41,7 +41,29 @@ app.get("/users/:id", async (req, res) => {
   }
 });
 
-//updating Request
+//update
+app.patch("/users/:id", async (req, res) => {
+  var updates = Object.keys(req.body);
+  var allowedUpdates = ["name", "password", "email", "age"];
+  var isValidOperation = updates.every((update) =>
+    allowedUpdates.includes(update)
+  );
+  if (!isValidOperation) {
+    return res.status(400).send({ error: "invalid Updates" });
+  }
+  try {
+    var user = await User.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!user) {
+      return res.status(404).send();
+    }
+    res.send(user);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
 
 //create a post request for task
 app.post("/tasks", async (req, res) => {
@@ -61,6 +83,42 @@ app.get("/tasks", async (req, res) => {
     res.send(tasks);
   } catch (e) {
     res.status(400).send(e);
+  }
+});
+//update
+app.patch("/tasks/:id", async (req, res) => {
+  var updates = Object.keys(req.body);
+  var allowedUpdates = ["description", "completed"];
+  var isValidOperation = updates.every((update) =>
+    allowedUpdates.includes(update)
+  );
+  if (!isValidOperation) {
+    return res.status(400).send({ error: "invalid data input" });
+  }
+  try {
+    var task = await Task.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!task) {
+      return res.status(404).send();
+    }
+    res.send(task);
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+//delete task
+app.delete("/tasks/:id", async (req, res) => {
+  var id = req.params.id;
+  try {
+    var task = await Task.findByIdAndDelete(id);
+    if (!task) {
+      res.status(404).send();
+    }
+    res.send(task);
+  } catch (e) {
+    res.status(500).send(e);
   }
 });
 
