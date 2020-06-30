@@ -1,6 +1,9 @@
+var express = require("express");
+var User = require("../models/users");
+var router = express.Router();
+
 //post user
-app.use(express.json());
-app.post("/users", async (req, res) => {
+router.post("/users", async (req, res) => {
   var user = new User(req.body);
   try {
     await user.save();
@@ -11,7 +14,7 @@ app.post("/users", async (req, res) => {
 });
 
 //get all users
-app.get("/users", async (req, res) => {
+router.get("/users", async (req, res) => {
   try {
     var users = await User.find({});
     res.send(users);
@@ -21,7 +24,7 @@ app.get("/users", async (req, res) => {
 });
 
 //get one user
-app.get("/users/:id", async (req, res) => {
+router.get("/users/:id", async (req, res) => {
   var id = req.params.id;
   try {
     var user = await User.findById(id);
@@ -35,7 +38,7 @@ app.get("/users/:id", async (req, res) => {
 });
 
 //update
-app.patch("/users/:id", async (req, res) => {
+router.patch("/users/:id", async (req, res) => {
   var updates = Object.keys(req.body);
   var allowedUpdates = ["name", "password", "email", "age"];
   var isValidOperation = updates.every((update) =>
@@ -59,7 +62,7 @@ app.patch("/users/:id", async (req, res) => {
 });
 
 //delete user
-app.delete("/users/:id", async (req, res) => {
+router.delete("/users/:id", async (req, res) => {
   var id = req.params.id;
   try {
     var users = await User.findByIdAndDelete(id);
@@ -71,3 +74,5 @@ app.delete("/users/:id", async (req, res) => {
     res.status(500).send(e);
   }
 });
+
+module.exports = router;

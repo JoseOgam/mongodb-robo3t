@@ -1,5 +1,8 @@
+var express = require("express");
+const router = express.Router();
+const Task = require("../models/task");
 //create a post request for task
-app.post("/tasks", async (req, res) => {
+router.post("/tasks", async (req, res) => {
   var task = new Task(req.body);
   try {
     await task.save();
@@ -10,7 +13,7 @@ app.post("/tasks", async (req, res) => {
 });
 
 //get request for tasks
-app.get("/tasks", async (req, res) => {
+router.get("/tasks", async (req, res) => {
   try {
     var task = await Task.find({});
     res.send(task);
@@ -19,7 +22,7 @@ app.get("/tasks", async (req, res) => {
   }
 });
 //update task
-app.patch("/tasks/:id", async (req, res) => {
+router.patch("/tasks/:id", async (req, res) => {
   var updates = Object.keys(req.body);
   var allowedUpdates = ["description", "completed"];
   var isValidOperation = updates.every((update) =>
@@ -42,7 +45,7 @@ app.patch("/tasks/:id", async (req, res) => {
   }
 });
 //delete task
-app.delete("/tasks/:id", async (req, res) => {
+router.delete("/tasks/:id", async (req, res) => {
   var id = req.params.id;
   try {
     var task = await Task.findByIdAndDelete(id);
@@ -54,3 +57,5 @@ app.delete("/tasks/:id", async (req, res) => {
     res.status(500).send(e);
   }
 });
+
+module.exports = router;
