@@ -1,26 +1,39 @@
 var express = require("express");
 var User = require("../models/users");
 var router = express.Router();
+var auth = require("../middleware/auth");
 
 //post user
 router.post("/users", async (req, res) => {
   var user = new User(req.body);
   try {
     await user.save();
-    res.status(201).send(user);
+    var token = await user.generateToken();
+    res.status(201).send({ user, token });
+  } catch (e) {
+    res.status(400).send(e);
+  }
+});
+//login
+router.post("/users/login", async (req, res) => {
+  try {
+    var user = await User.findByCredentials(req.body.email, req.body.password);
+    var token = await user.generateToken();
+    res.send({ user, token });
   } catch (e) {
     res.status(400).send(e);
   }
 });
 
 //get all users
-router.get("/users", async (req, res) => {
-  try {
-    var users = await User.find({});
-    res.send(users);
-  } catch (err) {
-    res.status(500).send(err);
-  }
+router.get("/users/me", auth, async (req, res) => {
+  res.send(req.user);
+  // try {
+  //   var users = await User.find({});
+  //   res.send(users);
+  // } catch (err) {
+  //   res.status(500).send(err);
+  // }
 });
 
 //get one user
@@ -72,16 +85,6 @@ router.delete("/users/:id", async (req, res) => {
     res.send(users);
   } catch (e) {
     res.status(500).send(e);
-  }
-});
-
-//login
-router.post("/users/login", async (req, res) => {
-  try {
-    var user = await User.findByCredentials(req.body.email, req.body.password);
-    res.send(user);
-  } catch (e) {
-    res.status(400).send(e);
   }
 });
 
